@@ -68,10 +68,14 @@ public class GalleryController: UIViewController, PermissionControllerDelegate {
   }
 
   func makePagesController() -> PagesController? {
+    guard !needsPermission() else {
+        return nil
+    }
+    
     guard Permission.Photos.status == .authorized else {
       return nil
     }
-
+    
     let useCamera = Permission.Camera.needsPermission && Permission.Camera.status == .authorized
 
     let tabsToShow = Config.tabsToShow.compactMap { $0 != .cameraTab ? $0 : (useCamera ? $0 : nil) }
@@ -107,6 +111,14 @@ public class GalleryController: UIViewController, PermissionControllerDelegate {
 
   // MARK: - Setup
 
+    func needsPermission() -> Bool {
+        if (Permission.Camera.needsPermission && Permission.Camera.status == .notDetermined) ||
+            (Permission.Photos.needsPermission && Permission.Photos.status == .notDetermined) {
+            return true
+        }
+        return false
+    }
+    
   func setup() {
     EventHub.shared.close = { [weak self] in
       if let strongSelf = self {

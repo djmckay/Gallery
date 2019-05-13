@@ -12,6 +12,11 @@ struct Permission {
   }
 
   struct Photos {
+    
+    static var needsPermission: Bool {
+        return Config.tabsToShow.index(of: .imageTab) != nil
+    }
+    
     static var status: Status {
       switch PHPhotoLibrary.authorizationStatus() {
       case .notDetermined:
